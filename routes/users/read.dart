@@ -19,10 +19,12 @@ Future<Response> onRequest(RequestContext context) async {
   }
 
   try {
-    final result = db.select(
+    // SQL Injection 방지
+    final stmt = db.prepare(
       'SELECT id, email, username, password FROM users WHERE email = ?',
-      [email],
     );
+    final result = stmt.select([email]);
+    stmt.dispose();
 
     if (result.isEmpty) {
       return Response.json(
