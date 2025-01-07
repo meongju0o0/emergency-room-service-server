@@ -14,3 +14,9 @@ build/
 
 # Test related files
 coverage/
+
+# Environment files
+/.env
+
+# Database files
+/user_database.db
