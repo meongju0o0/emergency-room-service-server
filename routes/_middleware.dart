@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:dotenv/dotenv.dart';
@@ -32,7 +34,9 @@ Handler middleware(Handler handler) {
         FOREIGN KEY (user_id) REFERENCES users (id)
       );
     ''')
-    ..execute('CREATE INDEX IF NOT EXISTS idx_email ON users (email);');
+    ..execute('CREATE INDEX IF NOT EXISTS idx_email ON users (email);')
+    ..execute('CREATE INDEX IF NOT EXISTS idx_user_disease_id ON user_disease (user_id);')
+    ..execute('CREATE INDEX IF NOT EXISTS idx_uwer_medicine_id ON user_medicine (user_id);');
 
   return handler
       .use(provider<Database>((context) => db)) // DB 핸들러에 등록
