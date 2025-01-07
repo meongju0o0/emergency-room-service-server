@@ -17,7 +17,7 @@ Handler middleware(Handler handler) {
       );
     ''')
     ..execute('''
-      CREATE TABLE IF NOT EXISTS disease_codes (
+      CREATE TABLE IF NOT EXISTS user_disease (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         code TEXT NOT NULL,
@@ -25,7 +25,7 @@ Handler middleware(Handler handler) {
       );
     ''')
     ..execute('''
-      CREATE TABLE IF NOT EXISTS medicine_codes (
+      CREATE TABLE IF NOT EXISTS user_medicine (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
         code TEXT NOT NULL,
@@ -35,8 +35,8 @@ Handler middleware(Handler handler) {
     ..execute('CREATE INDEX IF NOT EXISTS idx_email ON users (email);');
 
   return handler
-      .use(provider<Database>((context) => db))
-      .use(authMiddleware()); // JWT 인증 미들웨어 추가
+      .use(provider<Database>((context) => db)) // DB 핸들러에 등록
+      .use(authMiddleware()); // JWT 인증 핸들러에 등록
 }
 
 // JWT 인증 미들웨어

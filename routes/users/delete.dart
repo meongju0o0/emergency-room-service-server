@@ -46,8 +46,8 @@ Future<Response> onRequest(RequestContext context) async {
 
     // 질병 코드, 의약품 코드, 사용자 삭제
     db
-      ..execute('DELETE FROM disease_codes WHERE user_id = ?', [userId])
-      ..execute('DELETE FROM medicine_codes WHERE user_id = ?', [userId])
+      ..execute('DELETE FROM user_disease WHERE user_id = ?', [userId])
+      ..execute('DELETE FROM user_medicine WHERE user_id = ?', [userId])
       ..execute('DELETE FROM users WHERE id = ?', [userId]);
 
     return Response.json(

@@ -38,7 +38,7 @@ Future<Response> onRequest(RequestContext context) async {
     if (diseaseCodes != null) {
       for (final code in diseaseCodes) {
         db.execute(
-          'INSERT INTO disease_codes (user_id, code) VALUES (?, ?)',
+          'INSERT INTO user_disease (user_id, code) VALUES (?, ?)',
           [userId, code],
         );
       }
@@ -48,7 +48,7 @@ Future<Response> onRequest(RequestContext context) async {
     if (medicineCodes != null) {
       for (final code in medicineCodes) {
         db.execute(
-          'INSERT INTO medicine_codes (user_id, code) VALUES (?, ?)',
+          'INSERT INTO user_medicine (user_id, code) VALUES (?, ?)',
           [userId, code],
         );
       }
