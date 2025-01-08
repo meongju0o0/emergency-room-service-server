@@ -17,7 +17,7 @@ def define_tables(metadata):
         'hospital_info', metadata,
         Column('id', Integer, primary_key=True, autoincrement=True),
         Column('addr', String),
-        Column('cl_cd', Integer),
+        Column('cl_cd', String),
         Column('cl_cd_nm', String),
         Column('hosp_url', String),
         Column('mdept_intn_cnt', Integer),
@@ -29,7 +29,7 @@ def define_tables(metadata):
         Column('yadm_nm', String),
         Column('geom', Geometry('POINT', srid=4326)),
     )
-    Index('idx_geom', hospital_info_table.c.geom)
+    Index('idx_geom', text("geom"), postgresql_using='gist')
     return hospital_info_table
 
 
