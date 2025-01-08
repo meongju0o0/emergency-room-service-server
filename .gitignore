@@ -18,5 +18,5 @@ coverage/
 # Environment files
 /.env
 
-# Database files
-/user_database.db
+# Data files
+/data_scripts/data_sources/*

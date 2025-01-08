@@ -1,11 +1,13 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:sqlite3/sqlite3.dart';
+import 'package:postgres/postgres.dart';
 
 import '../../utils/encryption.dart';
 
 Future<Response> onRequest(RequestContext context) async {
-  final db = context.read<Database>();
+  final db = context.read<Connection>();
 
   // JWT에서 사용자 정보 추출
   final jwt = context.read<JWT>();
@@ -37,9 +39,11 @@ Future<Response> onRequest(RequestContext context) async {
 
   try {
     // 사용자 ID 가져오기
-    final result = db.select(
-      'SELECT id FROM users WHERE email = ?',
-      [email],
+    final result = await db.execute(
+      Sql.named('SELECT id FROM users WHERE email = @email'),
+      parameters: {
+        'email': email,
+      },
     );
 
     if (result.isEmpty) {
@@ -49,38 +53,59 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    final userId = result.first['id'] as int;
+    final userId = result.first[0];
 
     // 비밀번호 암호화
     final hashedPassword = password != null ? hashPassword(password) : null;
 
     // 사용자 정보 업데이트
-    db
-      ..execute(
-        '''
-        UPDATE users
-        SET username = ?, password = COALESCE(?, password)
-        WHERE email = ?
-        ''',
-        [username, hashedPassword, email],
-      )
-      ..execute('DELETE FROM user_disease WHERE user_id = ?', [userId])
-      ..execute('DELETE FROM user_medicine WHERE user_id = ?', [userId]);
+    await db.execute(
+      Sql.named('''
+      UPDATE users
+      SET username = @username, password = @hashedPassword
+      WHERE email = @email
+      '''),
+      parameters: {
+        'username': username,
+        'hashedPassword': hashedPassword,
+        'email': email,
+      },
+    );
+
+    await db.execute(
+      Sql.named('DELETE FROM user_disease WHERE user_id = @user_id'), 
+      parameters: {
+        'user_id': userId,
+      },
+    );
+
+    await db.execute(
+      Sql.named('DELETE FROM user_drug WHERE user_id = @user_id'), 
+      parameters: {
+        'user_id': userId,
+      },
+    );
 
     if (diseaseCodes != null) {
       for (final code in diseaseCodes) {
-        db.execute(
-          'INSERT INTO user_disease (user_id, code) VALUES (?, ?)',
-          [userId, code],
+        await db.execute(
+          Sql.named('INSERT INTO user_disease (user_id, code) VALUES (@user_id, @code)'),
+          parameters: {
+            'user_id': userId,
+            'code': code,
+          },
         );
       }
     }
 
     if (medicineCodes != null) {
       for (final code in medicineCodes) {
-        db.execute(
-          'INSERT INTO user_medicine (user_id, code) VALUES (?, ?)',
-          [userId, code],
+        await db.execute(
+          Sql.named('INSERT INTO user_drug (user_id, item_seq) VALUES (@user_id, @item_seq)'),
+          parameters: {
+            'user_id': userId,
+            'item_seq': code,
+          },
         );
       }
     }

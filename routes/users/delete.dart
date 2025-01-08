@@ -1,9 +1,9 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:sqlite3/sqlite3.dart';
+import 'package:postgres/postgres.dart';
 
 Future<Response> onRequest(RequestContext context) async {
-  final db = context.read<Database>();
+  final db = context.read<Connection>();
 
   // JWT에서 사용자 정보 추출
   final jwt = context.read<JWT>();
@@ -30,9 +30,11 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // 사용자 ID 가져오기
-    final result = db.select(
-      'SELECT id FROM users WHERE email = ?',
-      [email],
+    final result = await db.execute(
+      Sql.named('SELECT id FROM users WHERE email = @email'),
+      parameters: {
+        'email': email,
+      },
     );
 
     if (result.isEmpty) {
@@ -42,13 +44,31 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    final userId = result.first['id'] as int;
+    final userId = result.first[0];
 
-    // 질병 코드, 의약품 코드, 사용자 삭제
-    db
-      ..execute('DELETE FROM user_disease WHERE user_id = ?', [userId])
-      ..execute('DELETE FROM user_medicine WHERE user_id = ?', [userId])
-      ..execute('DELETE FROM users WHERE id = ?', [userId]);
+    // 질병 코드 삭제
+    await db.execute(
+      Sql.named('DELETE FROM user_disease WHERE user_id = @user_id'),
+      parameters: {
+        'user_id': userId,
+        },
+    );
+
+    // 의약품 코드 삭제
+    await db.execute(
+      Sql.named('DELETE FROM user_drug WHERE user_id = @user_id'),
+      parameters: {
+        'user_id': userId,
+        },
+    );
+
+    // 사용자 삭제
+    await db.execute(
+      Sql.named('DELETE FROM users WHERE id = @user_id'),
+      parameters: {
+        'user_id': userId,
+        },
+    );
 
     return Response.json(
       body: {'message': 'User deleted successfully'},

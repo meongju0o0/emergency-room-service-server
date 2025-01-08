@@ -1,11 +1,11 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:sqlite3/sqlite3.dart';
+import 'package:postgres/postgres.dart';
 
 import '../../utils/encryption.dart';
 
 Future<Response> onRequest(RequestContext context) async {
-  final db = context.read<Database>();
+  final db = context.read<Connection>();
   final body = await context.request.json() as Map<String, dynamic>;
 
   final email = body['email'] as String?;
@@ -20,11 +20,10 @@ Future<Response> onRequest(RequestContext context) async {
 
   try {
     // SQL Injection 방지
-    final stmt = db.prepare(
-      'SELECT id, email, username, password FROM users WHERE email = ?',
+    final stmt = await db.prepare(
+      r'SELECT id, email, username, password FROM users WHERE email = $1',
     );
-    final result = stmt.select([email]);
-    stmt.dispose();
+    final result = await stmt.run([email]);
 
     if (result.isEmpty) {
       return Response.json(
@@ -33,7 +32,7 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    final user = result.first;
+    final user = result.first.toColumnMap();
 
     // 비밀번호 검증
     // ignore: lines_longer_than_80_chars

@@ -1,10 +1,10 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:sqlite3/sqlite3.dart';
+import 'package:postgres/postgres.dart';
 
 import '../../utils/encryption.dart';
 
 Future<Response> onRequest(RequestContext context) async {
-  final db = context.read<Database>();
+  final db = context.read<Connection>();
   final body = await context.request.json() as Map<String, dynamic>;
 
   final email = body['email'] as String?;
@@ -23,33 +23,50 @@ Future<Response> onRequest(RequestContext context) async {
   // 비밀번호 암호화
   final hashedPassword = hashPassword(password);
 
+  // 트랜잭션 처리
   try {
-    db.execute(
+    final result = await db.execute(
+      Sql.named(
       '''
       INSERT INTO users (email, username, password)
-      VALUES (?, ?, ?)
-      ''',
-      [email, username, hashedPassword],
+      VALUES (@email, @username, @password)
+      RETURNING id
+      '''),
+      parameters: {
+        'email': email,
+        'username': username,
+        'password': hashedPassword,
+      },
     );
 
-    final userId = db.lastInsertRowId;
-
-    // 질병 코드 삽입
+    final userId = result.first[0];
     if (diseaseCodes != null) {
       for (final code in diseaseCodes) {
-        db.execute(
-          'INSERT INTO user_disease (user_id, code) VALUES (?, ?)',
-          [userId, code],
+        await db.execute(
+          Sql.named(
+          '''
+          INSERT INTO user_disease (user_id, code)
+          VALUES (@user_id, @code)
+          '''),
+          parameters: {
+            'user_id': userId,
+            'code': code,
+          },
         );
       }
     }
-
-    // 의약품 코드 삽입
     if (medicineCodes != null) {
       for (final code in medicineCodes) {
-        db.execute(
-          'INSERT INTO user_medicine (user_id, code) VALUES (?, ?)',
-          [userId, code],
+        await db.execute(
+          Sql.named(
+          '''
+          INSERT INTO user_drug (user_id, item_seq)
+          VALUES (@user_id, @item_seq)
+          '''),
+          parameters: {
+            'user_id': userId,
+            'item_seq': code,
+          },
         );
       }
     }

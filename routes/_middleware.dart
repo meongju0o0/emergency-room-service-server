@@ -1,54 +1,16 @@
-// ignore_for_file: lines_longer_than_80_chars
-
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:dotenv/dotenv.dart';
-import 'package:sqlite3/sqlite3.dart';
+import 'package:postgres/postgres.dart';
 
-// 데이터베이스 초기화
-final db = sqlite3.open('user_database.db');
-
-Handler middleware(Handler handler) {
-  db
-    ..execute('''
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
-        username TEXT NOT NULL,
-        password TEXT NOT NULL
-      );
-    ''')
-    ..execute('''
-      CREATE TABLE IF NOT EXISTS user_disease (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        code TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users (id)
-      );
-    ''')
-    ..execute('''
-      CREATE TABLE IF NOT EXISTS user_medicine (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        code TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users (id)
-      );
-    ''')
-    ..execute('CREATE INDEX IF NOT EXISTS idx_email ON users (email);')
-    ..execute('CREATE INDEX IF NOT EXISTS idx_user_disease_id ON user_disease (user_id);')
-    ..execute('CREATE INDEX IF NOT EXISTS idx_uwer_medicine_id ON user_medicine (user_id);');
-
-  return handler
-      .use(provider<Database>((context) => db)) // DB 핸들러에 등록
-      .use(authMiddleware()); // JWT 인증 핸들러에 등록
-}
+import '../utils/database.dart';
 
 // JWT 인증 미들웨어
 Middleware authMiddleware() {
   return (handler) {
     return (context) async {
-      // 인증이 필요 없는 경로
       final unprotectedPaths = ['/', '/users/add', '/users/read'];
+
       if (unprotectedPaths.contains(context.request.uri.path)) {
         return handler(context);
       }
@@ -65,10 +27,8 @@ Middleware authMiddleware() {
         final dotenv = DotEnv()..load();
         final secretKey = dotenv['JWT_SECRET_KEY'] ?? 'default_secret_key';
 
-        final token = authHeader.substring(7); // "Bearer " 이후의 토큰 추출
-        final jwt = JWT.verify(token, SecretKey(secretKey)); // JWT 검증
-
-        // 사용자 정보를 컨텍스트에 저장
+        final token = authHeader.substring(7);
+        final jwt = JWT.verify(token, SecretKey(secretKey));
         context = context.provide<JWT>(() => jwt);
 
         return handler(context);
@@ -80,4 +40,13 @@ Middleware authMiddleware() {
       }
     };
   };
+}
+
+// 미들웨어 체인 설정
+Handler middleware(Handler handler) {
+  initializeDatabase();
+
+  return handler
+      .use(provider<Connection>((context) => connection))
+      .use(authMiddleware());
 }
