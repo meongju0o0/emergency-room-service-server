@@ -59,12 +59,13 @@ Future<Response> onRequest(RequestContext context) async {
     final hashedPassword = password != null ? hashPassword(password) : null;
 
     // 사용자 정보 업데이트
-    await db.execute(
-      Sql.named('''
-      UPDATE users
-      SET username = @username, password = @hashedPassword
-      WHERE email = @email
-      '''),
+    await db.execute(Sql.named(
+        '''
+        UPDATE users
+        SET username = @username, password = @hashedPassword
+        WHERE email = @email
+        '''
+      ),
       parameters: {
         'username': username,
         'hashedPassword': hashedPassword,

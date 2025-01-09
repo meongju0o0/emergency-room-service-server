@@ -3,7 +3,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:dotenv/dotenv.dart';
 import 'package:postgres/postgres.dart';
 
-import '../utils/database.dart';
+import '../utils/init_user_tables.dart';
 
 // JWT 인증 미들웨어
 Middleware authMiddleware() {
@@ -47,6 +47,6 @@ Handler middleware(Handler handler) {
   initializeDatabase();
 
   return handler
-      .use(provider<Connection>((context) => connection))
-      .use(authMiddleware());
+    .use(provider<Connection>((context) => connection))
+    .use(authMiddleware());
 }

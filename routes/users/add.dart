@@ -25,13 +25,13 @@ Future<Response> onRequest(RequestContext context) async {
 
   // 트랜잭션 처리
   try {
-    final result = await db.execute(
-      Sql.named(
-      '''
-      INSERT INTO users (email, username, password)
-      VALUES (@email, @username, @password)
-      RETURNING id
-      '''),
+    final result = await db.execute(Sql.named(
+        '''
+        INSERT INTO users (email, username, password)
+        VALUES (@email, @username, @password)
+        RETURNING id
+        '''
+      ),
       parameters: {
         'email': email,
         'username': username,
@@ -42,12 +42,12 @@ Future<Response> onRequest(RequestContext context) async {
     final userId = result.first[0];
     if (diseaseCodes != null) {
       for (final code in diseaseCodes) {
-        await db.execute(
-          Sql.named(
-          '''
-          INSERT INTO user_disease (user_id, code)
-          VALUES (@user_id, @code)
-          '''),
+        await db.execute(Sql.named(
+            '''
+            INSERT INTO user_disease (user_id, code)
+            VALUES (@user_id, @code)
+            '''
+          ),
           parameters: {
             'user_id': userId,
             'code': code,
@@ -57,12 +57,12 @@ Future<Response> onRequest(RequestContext context) async {
     }
     if (medicineCodes != null) {
       for (final code in medicineCodes) {
-        await db.execute(
-          Sql.named(
-          '''
-          INSERT INTO user_drug (user_id, item_seq)
-          VALUES (@user_id, @item_seq)
-          '''),
+        await db.execute(Sql.named(
+            '''
+            INSERT INTO user_drug (user_id, item_seq)
+            VALUES (@user_id, @item_seq)
+            '''
+          ),
           parameters: {
             'user_id': userId,
             'item_seq': code,
