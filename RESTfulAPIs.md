@@ -7,8 +7,8 @@
         "email": "test@example.com",
         "username": "testuser",
         "password": "password",
-        "disease_codes": ["D001", "D002"],
-        "medicine_codes": ["M001", "M002"]
+        "disease_codes": [],
+        "medicine_codes": []
     }
     ```
 ### Response
@@ -49,10 +49,10 @@
     ```json
     {
         "email": "test@example.com",
-        "username": "updated_user",
-        "password": "new_password",
-        "disease_codes": ["D001"],
-        "medicine_codes": ["M001"]
+        "username": "testuser",
+        "password": "password",
+        "disease_codes": ["I10", "I49", "K760"],
+        "medicine_codes": ["198100119", "198401396"]
     }
     ```
 ### Response
@@ -71,7 +71,6 @@
         "Authorization": "Bearer <JWT Token>"
     }
     ```
-
 - body
     ```json
     {
