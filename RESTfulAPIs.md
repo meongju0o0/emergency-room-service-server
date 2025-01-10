@@ -2,7 +2,6 @@
 
 ## Users Management
 ### Registration (POST)
-- **http://localhost:8080/users/add**
 #### Request
 - body
     ```json
@@ -14,8 +13,14 @@
         "medicine_codes": ["M001", "M002"]
     }
     ```
-
 #### Response
+- body
+    ```json
+    {
+        "message": "User created succesfully"
+    }
+    ```
+
 ### Login (POST)
 #### Request
 - body
@@ -26,6 +31,7 @@
     }
     ```
 #### Response
+- body
     ```json
     {
         "message": "Login successful",
@@ -41,7 +47,6 @@
         "Authorization": "Bearer <JWT Token>"
     }
     ```
-
 - body
     ```json
     {
@@ -52,9 +57,16 @@
         "medicine_codes": ["M001"]
     }
     ```
-
 #### Response
+- body
+    ```json
+    {
+        "message": "User updated successfully"
+    }
+    ```
+
 ### Delete (DELETE)
+#### Request
 - header
     ```json
     {
@@ -63,8 +75,16 @@
     ```
 
 - body
-```json
+    ```json
     {
         "email": "test@example.com"
+    }
+    ```
+
+#### Response
+- body
+    ```json
+    {
+        "message": "User deleted successfully"
     }
     ```
