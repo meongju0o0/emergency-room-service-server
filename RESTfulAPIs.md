@@ -1,8 +1,6 @@
-# RESTfulAPIs Specification
-
-## Users Management
-### Registration (POST)
-#### Request
+# Users Management
+## Registration (POST)
+### Request
 - body
     ```json
     {
@@ -13,7 +11,7 @@
         "medicine_codes": ["M001", "M002"]
     }
     ```
-#### Response
+### Response
 - body
     ```json
     {
@@ -21,8 +19,8 @@
     }
     ```
 
-### Login (POST)
-#### Request
+## Login (POST)
+### Request
 - body
     ```json
     {
@@ -30,7 +28,7 @@
         "password": "password"
     }
     ```
-#### Response
+### Response
 - body
     ```json
     {
@@ -39,8 +37,8 @@
     }
     ```
 
-### Update (PUT)
-#### Request
+## Update (PUT)
+### Request
 - header
     ```json
     {
@@ -57,7 +55,7 @@
         "medicine_codes": ["M001"]
     }
     ```
-#### Response
+### Response
 - body
     ```json
     {
@@ -65,8 +63,8 @@
     }
     ```
 
-### Delete (DELETE)
-#### Request
+## Delete (DELETE)
+### Request
 - header
     ```json
     {
@@ -80,8 +78,7 @@
         "email": "test@example.com"
     }
     ```
-
-#### Response
+### Response
 - body
     ```json
     {
