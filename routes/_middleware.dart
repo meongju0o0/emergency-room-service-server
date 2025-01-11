@@ -5,11 +5,16 @@ import 'package:postgres/postgres.dart';
 
 import '../utils/init_user_tables.dart';
 
-// JWT 인증 미들웨어
 Middleware authMiddleware() {
   return (handler) {
     return (context) async {
-      final unprotectedPaths = ['/', '/users/add', '/users/read'];
+      final unprotectedPaths = [
+        '/',
+        '/users/add',
+        '/users/read',
+        '/medical/disease_query',
+        '/medical/drug_query',
+      ];
 
       if (unprotectedPaths.contains(context.request.uri.path)) {
         return handler(context);
@@ -42,7 +47,6 @@ Middleware authMiddleware() {
   };
 }
 
-// 미들웨어 체인 설정
 Handler middleware(Handler handler) {
   initializeDatabase();
 

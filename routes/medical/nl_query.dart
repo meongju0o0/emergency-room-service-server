@@ -83,7 +83,6 @@ Future<Response> onRequest(RequestContext context) async {
       },
     );
 
-    // 해당 코드의 의약품 정보 가져오기
     final List<List<dynamic>> drugInfos = await db.execute(
       Sql.named(
         '''
@@ -97,21 +96,22 @@ Future<Response> onRequest(RequestContext context) async {
       },
     );
 
-    // 자연어 질의 생성
     final drugs = drugInfos.map((row) => '- ${row[0]} (${row[1]}): ${row[2]}, ${row[3]}').join('\n');
     final diseases = diseaseInfos.map((row) => '- ${row[0]} (${row[1]})').join('\n');
 
     final query = '''
-    현재 환자의 호소 증상은 아래와 같다.
+    주어진 질문에 한글로 답변을 제공해주세요.
+
+    현재 환자의 호소 증상은 아래와 같습니다.
     $symptom
 
-    환자가 복용 중인 약물은 아래와 같다.
+    환자가 복용 중인 약물은 아래와 같습니다.
     $drugs
 
-    환자의 지병은 아래와 같다.
+    환자의 지병은 아래와 같습니다.
     $diseases
 
-    위 데이터를 참고하여, 적합한 진료 과목(가정의학과, 내과, 비뇨기과, 산부인과 등)을 추천해줘.
+    위 데이터를 참고하여, 적합한 진료 과목(가정의학과, 내과, 외과, 비뇨기과, 산부인과, 신경외과, ...)을 추천해주세요.
     ''';
 
     // Flask 서버로 요청 전송
