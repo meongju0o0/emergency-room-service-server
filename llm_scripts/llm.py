@@ -38,7 +38,7 @@ def process_query():
         
         response = llm.invoke(user_query)
 
-        dart_frog_url = "http://localhost:3000/receive-result"
+        dart_frog_url = "http://localhost:8080/medical/nl_query"
         response_data = {"query": user_query, "result": response}
 
         try:
