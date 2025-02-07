@@ -11,7 +11,7 @@ Future<void> initializeDatabase() async {
         host: 'localhost',
         database: 'ERSI',
         username: 'postgres',
-        password: 'apdpfhd3!',
+        password: 'password',
       ),
       settings: const ConnectionSettings(
         sslMode: SslMode.disable,
