@@ -4,7 +4,7 @@ from geoalchemy2 import Geometry
 from sqlalchemy.engine import Engine
 from sqlalchemy.sql import text
 
-DATABASE_URL = "postgresql://postgres:apdpfhd3!@localhost:5432/ERSI"
+DATABASE_URL = "postgresql://postgres:password@localhost:5432/ERSI"
 
 
 def create_database_engine(database_url: str) -> Engine:
