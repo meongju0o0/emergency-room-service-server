@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DateTime, Text, Index
 from sqlalchemy.engine import Engine
 
-DATABASE_URL = "postgresql://postgres:apdpfhd3!@localhost:5432/ERSI"
+DATABASE_URL = "postgresql://postgres:password@localhost:5432/ERSI"
 
 
 def create_database_engine(database_url: str) -> Engine:
